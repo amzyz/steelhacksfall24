@@ -1,6 +1,6 @@
 {
-  "title": "University Library API",
-  "description": "Search for documents and study room availability in the university library.",
+  "title": "Library and Study Room Search API",
+  "description": "Given a query, searches for documents or checks Hillman study room reservations.",
   "version": "0.0.1",
   "nodes": [
     {
@@ -9,16 +9,125 @@
       "configuration": {
         "schema": {
           "properties": {
-            "query": {
+            "context": {
               "type": "string",
-              "title": "Search Query",
-              "examples": ["Machine Learning", "Data Science"],
-              "default": "Machine Learning"
+              "title": "Query",
+              "examples": [],
+              "default": "[{\"role\":\"user\",\"parts\":[{\"text\":\"\"}]}]"
             }
           },
           "type": "object",
-          "required": ["query"]
+          "required": []
         }
       },
-      "metadata": { "visual": { "x": -300, "y": 10, "collapsed": false } }
+      "metadata": { "visual": { "x": -300, "y": 0, "collapsed": false } }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "properties": {
+            "context": {
+              "type": "string",
+              "title": "Results",
+              "examples": []
+            }
+          },
+          "type": "object",
+          "required": []
+        }
+      },
+      "metadata": { "visual": { "x": 600, "y": 0, "collapsed": false } }
+    },
+    {
+      "id": "urlTemplate-library",
+      "type": "urlTemplate",
+      "metadata": { "visual": { "x": -100, "y": 0, "collapsed": false } },
+      "configuration": {
+        "template": "https://pitt.primo.exlibrisgroup.com/primaws/rest/pub/pnxs?q={query}"
+      }
+    },
+    {
+      "id": "urlTemplate-studyRoom",
+      "type": "urlTemplate",
+      "metadata": { "visual": { "x": -100, "y": 100, "collapsed": false } },
+      "configuration": {
+        "template": "https://pitt.libcal.com/spaces/bookings/search?lid=917&gid=1558&seat=0"
+      }
+    },
+    {
+      "id": "fetch-library",
+      "type": "fetch",
+      "metadata": { "visual": { "x": 150, "y": 0, "collapsed": false } }
+    },
+    {
+      "id": "fetch-studyRoom",
+      "type": "fetch",
+      "metadata": { "visual": { "x": 150, "y": 100, "collapsed": false } }
+    },
+    {
+      "id": "jsonata-library",
+      "type": "jsonata",
+      "metadata": { "visual": { "x": 400, "y": 0, "collapsed": false } },
+      "configuration": { "expression": "docs.pnx.display" }
+    },
+    {
+      "id": "jsonata-studyRoom",
+      "type": "jsonata",
+      "metadata": { "visual": { "x": 400, "y": 100, "collapsed": false } },
+      "configuration": { "expression": "data" }
     }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "urlTemplate-library",
+      "out": "context",
+      "in": "query"
+    },
+    {
+      "from": "input",
+      "to": "urlTemplate-studyRoom",
+      "out": "context",
+      "in": "query"
+    },
+    {
+      "from": "urlTemplate-library",
+      "to": "fetch-library",
+      "out": "url",
+      "in": "url"
+    },
+    {
+      "from": "urlTemplate-studyRoom",
+      "to": "fetch-studyRoom",
+      "out": "url",
+      "in": "url"
+    },
+    {
+      "from": "fetch-library",
+      "to": "jsonata-library",
+      "out": "response",
+      "in": "json"
+    },
+    {
+      "from": "fetch-studyRoom",
+      "to": "jsonata-studyRoom",
+      "out": "response",
+      "in": "json"
+    },
+    {
+      "from": "jsonata-library",
+      "to": "output",
+      "out": "result",
+      "in": "context"
+    },
+    {
+      "from": "jsonata-studyRoom",
+      "to": "output",
+      "out": "result",
+      "in": "context"
+    }
+  ],
+  "url": "https://breadboard-ai.web.app/?tab0=idb://default/researcher-board.bgl.json"
+}
