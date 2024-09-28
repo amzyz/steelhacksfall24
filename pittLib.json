@@ -1,0 +1,24 @@
+{
+  "title": "University Library API",
+  "description": "Search for documents and study room availability in the university library.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "properties": {
+            "query": {
+              "type": "string",
+              "title": "Search Query",
+              "examples": ["Machine Learning", "Data Science"],
+              "default": "Machine Learning"
+            }
+          },
+          "type": "object",
+          "required": ["query"]
+        }
+      },
+      "metadata": { "visual": { "x": -300, "y": 10, "collapsed": false } }
+    }
